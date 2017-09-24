@@ -34,13 +34,12 @@ void port_conf_8N1(int fd, int IBAUD, int OBAUD, struct termios options){
          cfsetispeed(&options, B9600);
          cfsetospeed(&options, B9600);
          options.c_cflag |= (CLOCAL | CREAD);
-         tcsetattr(fd,TCSANOW, &options);   
-         options.c_cflag &= ~CSIZE;      
-         options.c_cflag |= CS8;        
          options.c_cflag &= ~PARENB;   
          options.c_cflag &= ~CSTOPB;
          options.c_cflag &= ~CSIZE;
          options.c_cflag |= CS8;
+	 options.c_lflag |= ICANON;
+         tcsetattr(fd,TCSANOW, &options);   
 }
 
 int main(void){
@@ -51,24 +50,42 @@ int main(void){
 	snsr.time_now = 0.00;
 	snsr.state &= ~(1 << 0); 
 	char ans;
+	double T_RH[2];
+
+	char in[1];
+	int bytesread;
+
+	int chk;
 
 	printf("\n\nEstablish Connection? (y/n) ");
 	scanf("%s",&ans);
 	if( ans == 'n'){exit(0);}
 
 	struct termios options;
-	char* PORTNAME = "/dev/tty.usbserial-AI0550D2";
+	char* PORTNAME = "/dev/ttyACM0";
 	int fd = open_port(PORTNAME, O_RDWR | O_NOCTTY | O_NDELAY);
+	
+	sleep(5);
 	if(fd != -1){
 		port_conf_8N1(fd, B9600, B9600, options); 
 		snsr.state |= CONNECTED;
 	}
-	printf("\n\nBegin Reading? (y/n) ");
-	scanf("%s",&ans);
-	if( ans == 'n'){exit(0);}
-	sleep(1);
+	printf("\nReseting Arduino...");
+	
+	snsr.state |= READING;
+	write(fd, snsr.state, sizeof(snsr.state));
 
-	for(int i=0; i<10; i++){
-		sleep(1);		
+	char buffer[128] = "temp text";
+
+	while(1){
+		printf("\nPRESS 0 for MSG: ");
+		scanf("%d",&chk);
+		if(chk == 0){
+			write(fd, "0", 1);
+			bytesread = read(fd,buffer,128);	
+			buffer[bytesread] = 0;
+			printf("\n%s",buffer);
+			sleep(1);
+		}
 	}
 }	
