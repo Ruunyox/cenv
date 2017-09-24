@@ -55,37 +55,33 @@ int main(void){
 	char in[1];
 	int bytesread;
 
+	char buffer[128] = "temp text";
 	int chk;
 
-	printf("\n\nEstablish Connection? (y/n) ");
+	printf("\nEstablish Connection? (y/n) ");
 	scanf("%s",&ans);
 	if( ans == 'n'){exit(0);}
 
 	struct termios options;
-	char* PORTNAME = "/dev/ttyACM0";
-	int fd = open_port(PORTNAME, O_RDWR | O_NOCTTY | O_NDELAY);
-	
-	sleep(5);
-	if(fd != -1){
-		port_conf_8N1(fd, B9600, B9600, options); 
-		snsr.state |= CONNECTED;
-	}
-	printf("\nReseting Arduino...");
-	
+	char* PORTNAME = "/dev/ttyACM1";
+	printf("\nEstablishing connection...");
+	fflush(stdout);
+	int fd = open_port(PORTNAME, O_RDWR | O_NOCTTY );
+	usleep(3500000);
+	printf("Done.");
+	printf("\nConfiguring port settings...");
+	port_conf_8N1(fd, B9600, B9600, options); 
+	printf("Done.");
+	snsr.state |= CONNECTED;
+	printf("\nBeginning data collection...\n");
+	fflush(stdout);
+	usleep(3500000);
 	snsr.state |= READING;
-	write(fd, snsr.state, sizeof(snsr.state));
-
-	char buffer[128] = "temp text";
-
 	while(1){
-		printf("\nPRESS 0 for MSG: ");
-		scanf("%d",&chk);
-		if(chk == 0){
-			write(fd, "0", 1);
-			bytesread = read(fd,buffer,128);	
-			buffer[bytesread] = 0;
-			printf("\n%s",buffer);
-			sleep(1);
-		}
+		write(fd, "0", 1);
+		bytesread = read(fd,buffer,128);	
+		buffer[bytesread] = 0;
+		printf("%s",buffer);
+		sleep(2);
 	}
 }	
