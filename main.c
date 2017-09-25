@@ -9,6 +9,8 @@
 #define READING      0x02 
 #define RECORDING    0x04
 
+#define RED 	     "\x1b[31m"
+
 struct SENSOR {
 	double temp_now;
 	double rh_now;
@@ -42,6 +44,16 @@ void port_conf_8N1(int fd, int IBAUD, int OBAUD, struct termios options){
          tcsetattr(fd,TCSANOW, &options);   
 }
 
+void curses_init(void){
+	initscr();
+	start_color();
+	cbreak();
+	noecho();
+	curs_set(0);
+	keyad(stdscr,TRUE);
+	refreh();
+}
+
 int main(void){
 
 	struct SENSOR snsr;
@@ -58,7 +70,7 @@ int main(void){
 	char buffer[128] = "temp text";
 	int chk;
 
-	printf("\nEstablish Connection? (y/n) ");
+	printf( RED "\nEstablish Connection? (y/n) ");
 	scanf("%s",&ans);
 	if( ans == 'n'){exit(0);}
 
@@ -73,15 +85,19 @@ int main(void){
 	port_conf_8N1(fd, B9600, B9600, options); 
 	printf("Done.");
 	snsr.state |= CONNECTED;
-	printf("\nBeginning data collection...\n");
+	printf("\nBeginning data collection...\n\n");
 	fflush(stdout);
 	usleep(3500000);
+
+	curses_init();
+
 	snsr.state |= READING;
 	while(1){
 		write(fd, "0", 1);
 		bytesread = read(fd,buffer,128);	
 		buffer[bytesread] = 0;
-		printf("%s",buffer);
+		printf("\r%s",buffer);
+		fflush(stdout);
 		sleep(2);
 	}
 }	
