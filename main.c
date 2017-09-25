@@ -10,6 +10,9 @@
 #define RECORDING    0x04
 
 #define RED 	     "\x1b[31m"
+#define PAD_X        12
+#define MAX_RH	     100.00
+#define MIN_RH	     0.00 
 
 struct SENSOR {
 	double temp_now;
@@ -51,14 +54,28 @@ void curses_init(void){
 	noecho();
 	curs_set(0);
 	keyad(stdscr,TRUE);
-	refreh();
 }
 
+WINDOW* rhbar init_rhbar(void){
+	WINDOW* rhbar = newwin(3,COLS-PAD_X,5,5);
+	wborder(rhbar,0,0,0,0,0,0,0,0);	
+	return rhbar;		
+}
+
+void update_rhbar(WINODW* rhbar,double rh){
+	double scale_factor = (LINES-PAD_X)/MAX_RH;
+	int dRH = floor(rh*scale_factor); //rescaled and discretized RH
+	wmove(rhbar,1,1);
+	whline(rhbar,ACS_BLOCK,dRH);
+	refresh();
+	wrefresh(rhbar);	 
+}
+	
 int main(void){
 
 	struct SENSOR snsr;
 	snsr.temp_now = 0.00;
-	snsr.rh_now = 0.00;
+	snsr.rh_now   = 0.00;
 	snsr.time_now = 0.00;
 	snsr.state &= ~(1 << 0); 
 	char ans;
@@ -90,6 +107,7 @@ int main(void){
 	usleep(3500000);
 
 	curses_init();
+	WINDOW* tbar = init_tbar();
 
 	snsr.state |= READING;
 	while(1){
