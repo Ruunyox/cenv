@@ -1,5 +1,5 @@
 CC = gcc
-LIBS = -lncurses -lm
+LIBS = -lncurses -lm -lpthread
 
 all:
 	${CC} -o main main.c ${LIBS}
