@@ -55,7 +55,7 @@ void port_conf_8N1(int fd, int IBAUD, int OBAUD, struct termios options){
 
 void curses_init(void){
 	initscr();
-	//start_color();
+	start_color();
 	cbreak();
 	noecho();
 	curs_set(0);
