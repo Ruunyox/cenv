@@ -2,6 +2,6 @@ CC = gcc
 LIBS = -lncurses -lm -lpthread
 
 all:
-	${CC} -o main main.c ${LIBS}
+	${CC} -o cenv cenv.c ${LIBS}
 clean:
 	rm *.o
