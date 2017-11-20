@@ -3,6 +3,10 @@
 
 ---
 
+<p align="center">
+<img src="cenv2.png"/>
+</p>
+
 C-ENV is a c-based application that communicates with an arduino over 
 an 8N1 serial connection to read temperature and humidty data over 
 time. It has been designed to work with slower sensors, such as the DHTxx 
