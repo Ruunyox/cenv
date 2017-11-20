@@ -15,7 +15,7 @@ sensors, pressure sensors, etc.
 
 # Dependencies
 
-<ncurses.h>
-<DHT.h>
-<DHT_U.h> 
+- <ncurses.h>
+- <DHT.h>
+- <DHT_U.h> 
 
