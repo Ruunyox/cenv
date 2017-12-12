@@ -4,7 +4,7 @@
 ---
 
 <p align="center">
-<img src="cenv2.png"/>
+<img src="cenv2.png" width=400px />
 </p>
 
 C-ENV is a c-based application that communicates with an arduino over 
